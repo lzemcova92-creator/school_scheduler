@@ -18,7 +18,6 @@ class MainWindow(QMainWindow):
         self._create_status_bar()
     
     def _create_menu_bar(self):
-        """Шапка (header) с меню — п.8"""
         menubar = self.menuBar()
         menubar.setStyleSheet("""
             QMenuBar {
@@ -39,40 +38,33 @@ class MainWindow(QMainWindow):
             }
         """)
         
-        # Меню "Файл"
         file_menu = menubar.addMenu("Файл")
         file_menu.addAction("Выход", self.close)
         
-        # Меню "Справочники"
         ref_menu = menubar.addMenu("Справочники")
         ref_menu.addAction("Преподаватели", lambda: self._show_message("Раздел в разработке"))
         ref_menu.addAction("Предметы", lambda: self._show_message("Раздел в разработке"))
         ref_menu.addAction("Аудитории", lambda: self._show_message("Раздел в разработке"))
         
-        # Меню "Расписание"
         sched_menu = menubar.addMenu("Расписание")
         sched_menu.addAction("Просмотр", lambda: self._show_message("Раздел в разработке"))
         sched_menu.addAction("Составить автоматически", lambda: self._show_message("Раздел в разработке"))
         
-        # Меню "Отчёты"
         rep_menu = menubar.addMenu("Отчёты")
         rep_menu.addAction("Экспорт в Excel", lambda: self._show_message("Раздел в разработке"))
         rep_menu.addAction("Экспорт в PDF", lambda: self._show_message("Раздел в разработке"))
         rep_menu.addAction("Резервная копия БД", lambda: self._show_message("Раздел в разработке"))
         
-        # Меню "О программе"
         help_menu = menubar.addMenu("Справка")
         help_menu.addAction("О программе", self._open_about)
     
     def _create_central_widget(self):
-        """Центральная часть с приветствием"""
         central = QWidget()
         self.setCentralWidget(central)
         
         layout = QVBoxLayout(central)
         layout.setAlignment(Qt.AlignCenter)
         
-        # Приветствие
         welcome = QLabel(f"Добро пожаловать, {self.user['full_name']}!")
         welcome.setStyleSheet("""
             font-size: 28px;
@@ -90,14 +82,13 @@ class MainWindow(QMainWindow):
         
         layout.addSpacing(30)
         
-        # Кнопки быстрого доступа
         buttons_layout = QHBoxLayout()
         buttons_layout.setAlignment(Qt.AlignCenter)
         
-        btn_schedule = QPushButton("📅 Расписание")
-        btn_teachers = QPushButton("‍🏫 Преподаватели")
-        btn_classrooms = QPushButton("🏫 Аудитории")
-        btn_reports = QPushButton(" Отчёты")
+        btn_schedule = QPushButton("Расписание")
+        btn_teachers = QPushButton("Преподаватели")
+        btn_classrooms = QPushButton("Аудитории")
+        btn_reports = QPushButton("Отчёты")
         
         for btn in [btn_schedule, btn_teachers, btn_classrooms, btn_reports]:
             btn.setFixedSize(180, 60)
@@ -123,7 +114,6 @@ class MainWindow(QMainWindow):
         layout.addLayout(buttons_layout)
     
     def _create_status_bar(self):
-        """Подвал (footer) — п.8"""
         self.statusBar().showMessage(
             f"Пользователь: {self.user['username']} | Роль: {self.user['role']}"
         )
@@ -137,7 +127,6 @@ class MainWindow(QMainWindow):
         """)
     
     def _open_about(self):
-        """Открыть окно «О программе»"""
         self.about_window = AboutWindow()
         self.about_window.show()
     

@@ -16,19 +16,20 @@ class AboutWindow(QMainWindow):
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(15)
         
-        title = QLabel(" Составитель расписания")
+        title = QLabel("Составитель расписания")
         title.setStyleSheet("font-size: 22px; font-weight: bold; color: #2c3e50;")
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
         
         layout.addWidget(QLabel("Версия: 1.0"))
         
-        fio = QLabel("Выполнила: Земцова Елизавета Андреевна")
+        # ЗАМЕНИ НА СВОИ ДАННЫЕ!
+        fio = QLabel("Выполнил: Иванов Иван Иванович")
         fio.setStyleSheet("font-size: 14px; font-weight: bold; color: #34495e;")
         fio.setAlignment(Qt.AlignCenter)
         layout.addWidget(fio)
         
-        group = QLabel("Группа: 22о")
+        group = QLabel("Группа: ИС-201")
         group.setStyleSheet("font-size: 14px; color: #7f8c8d;")
         group.setAlignment(Qt.AlignCenter)
         layout.addWidget(group)

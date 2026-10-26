@@ -19,8 +19,7 @@ class LoginWindow(QMainWindow):
         layout.setSpacing(15)
         layout.setContentsMargins(40, 30, 40, 30)
         
-        # Заголовок
-        title = QLabel("📚 Составитель расписания")
+        title = QLabel("Составитель расписания")
         title.setStyleSheet("font-size: 22px; font-weight: bold; color: #2c3e50;")
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
@@ -32,9 +31,8 @@ class LoginWindow(QMainWindow):
         
         layout.addSpacing(10)
         
-        # Поля ввода
         self.username_input = QLineEdit()
-        self.username_input.setPlaceholderText("👤 Логин")
+        self.username_input.setPlaceholderText("Логин")
         self.username_input.setStyleSheet("""
             QLineEdit {
                 padding: 12px;
@@ -50,7 +48,7 @@ class LoginWindow(QMainWindow):
         layout.addWidget(self.username_input)
         
         self.password_input = QLineEdit()
-        self.password_input.setPlaceholderText("🔒 Пароль")
+        self.password_input.setPlaceholderText("Пароль")
         self.password_input.setEchoMode(QLineEdit.Password)
         self.password_input.setStyleSheet("""
             QLineEdit {
@@ -66,7 +64,6 @@ class LoginWindow(QMainWindow):
         """)
         layout.addWidget(self.password_input)
         
-        # Кнопка входа
         self.login_button = QPushButton("Войти")
         self.login_button.setFixedHeight(45)
         self.login_button.setStyleSheet("""
@@ -87,7 +84,6 @@ class LoginWindow(QMainWindow):
         """)
         layout.addWidget(self.login_button)
         
-        # Подсказка
         hint = QLabel("Тест: admin / admin123")
         hint.setStyleSheet("font-size: 12px; color: #95a5a6;")
         hint.setAlignment(Qt.AlignCenter)
@@ -95,11 +91,9 @@ class LoginWindow(QMainWindow):
         
         self.login_button.clicked.connect(self.try_login)
         
-        # Анимация появления окна
         self._animate_appearance()
     
     def _animate_appearance(self):
-        """Анимация появления окна (п.4 - анимация объекта)"""
         self.setWindowOpacity(0)
         self.animation = QPropertyAnimation(self, b"windowOpacity")
         self.animation.setDuration(500)
@@ -123,14 +117,12 @@ class LoginWindow(QMainWindow):
                 self, "Успех", 
                 f"Добро пожаловать, {user['full_name']}!\nРоль: {user['role']}"
             )
-            # Сохраняем данные пользователя для дальнейшего использования
             self.current_user = user
             self._open_main_window()
         else:
             QMessageBox.critical(self, "Ошибка", "Неверный логин или пароль!")
     
     def _open_main_window(self):
-        """Переход в главное окно"""
         from ui.main_window import MainWindow
         self.main_window = MainWindow(self.current_user)
         self.main_window.show()
