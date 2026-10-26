@@ -1,4 +1,5 @@
 import math
+import os
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QPushButton, QMessageBox)
 from PyQt5.QtCore import Qt, QTimer
@@ -8,6 +9,8 @@ from ui.teachers_window import TeachersWindow
 from ui.classrooms_window import ClassroomsWindow
 from ui.subjects_window import SubjectsWindow
 from ui.schedule_window import ScheduleWindow
+from ui.reports_window import ReportsWindow
+from reports.report_generator import ReportGenerator
 
 
 class AnimatedBackground(QWidget):
@@ -52,13 +55,12 @@ class MainWindow(QMainWindow):
     def __init__(self, user):
         super().__init__()
         self.user = user
+        self.report_gen = ReportGenerator()
         self.setWindowTitle(f"Составитель расписания — {user['full_name']}")
         self.resize(1000, 700)
         
-        # Создаём меню и статус-бар
         self._create_menu_bar()
         
-        # Центральный виджет
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         
@@ -71,7 +73,6 @@ class MainWindow(QMainWindow):
         main_layout.setSpacing(20)
         main_layout.setContentsMargins(50, 50, 50, 50)
         
-        # Заголовок
         welcome = QLabel(f"Добро пожаловать, {self.user['full_name']}!")
         welcome.setStyleSheet("""
             font-size: 32px;
@@ -84,7 +85,6 @@ class MainWindow(QMainWindow):
         welcome.setAlignment(Qt.AlignCenter)
         main_layout.addWidget(welcome)
         
-        # Роль
         role_label = QLabel(f"Ваша роль: {self.user['role'].upper()}")
         role_label.setStyleSheet("""
             font-size: 18px;
@@ -98,18 +98,15 @@ class MainWindow(QMainWindow):
         
         main_layout.addSpacing(40)
         
-        # Горизонтальный layout для кнопок
         buttons_layout = QHBoxLayout()
         buttons_layout.setSpacing(30)
         buttons_layout.setAlignment(Qt.AlignCenter)
         
-        # Создаём кнопки
         btn_schedule = QPushButton("Расписание")
         btn_teachers = QPushButton("Преподаватели")
         btn_classrooms = QPushButton("Аудитории")
         btn_reports = QPushButton("Отчёты")
         
-        # Общий стиль для кнопок
         button_style = """
             QPushButton {
                 background-color: #3498db;
@@ -128,7 +125,6 @@ class MainWindow(QMainWindow):
             }
         """
         
-        # Применяем стили и подключаем обработчики
         btn_schedule.setStyleSheet(button_style)
         btn_schedule.setFixedSize(200, 70)
         btn_schedule.clicked.connect(self._open_schedule)
@@ -143,9 +139,8 @@ class MainWindow(QMainWindow):
         
         btn_reports.setStyleSheet(button_style)
         btn_reports.setFixedSize(200, 70)
-        btn_reports.clicked.connect(lambda: self._show_message("Раздел Отчёты в разработке"))
+        btn_reports.clicked.connect(self._open_reports)
         
-        # Добавляем кнопки в layout
         buttons_layout.addWidget(btn_schedule)
         buttons_layout.addWidget(btn_teachers)
         buttons_layout.addWidget(btn_classrooms)
@@ -154,11 +149,9 @@ class MainWindow(QMainWindow):
         main_layout.addLayout(buttons_layout)
         main_layout.addStretch()
         
-        # Статус-бар
         self._create_status_bar()
     
     def resizeEvent(self, event):
-        """Обновляем размер фона при изменении размера окна"""
         if hasattr(self, 'background'):
             self.background.setGeometry(0, 0, self.width(), self.height())
         super().resizeEvent(event)
@@ -196,10 +189,13 @@ class MainWindow(QMainWindow):
         sched_menu.addAction("Просмотр расписания", self._open_schedule)
         sched_menu.addAction("Составить автоматически", self._open_schedule)
         
+        # ВАЖНО: каждый пункт меню делает своё действие сразу
         rep_menu = menubar.addMenu("Отчёты")
-        rep_menu.addAction("Экспорт в Excel", lambda: self._show_message("Раздел в разработке"))
-        rep_menu.addAction("Экспорт в PDF", lambda: self._show_message("Раздел в разработке"))
-        rep_menu.addAction("Резервная копия БД", lambda: self._show_message("Раздел в разработке"))
+        rep_menu.addAction("Экспорт в Excel", self._export_excel)
+        rep_menu.addAction("Экспорт в PDF", self._export_pdf)
+        rep_menu.addAction("Резервная копия БД", self._backup_db)
+        rep_menu.addSeparator()
+        rep_menu.addAction("Все отчёты (панель)", self._open_reports)
         
         help_menu = menubar.addMenu("Справка")
         help_menu.addAction("О программе", self._open_about)
@@ -216,6 +212,28 @@ class MainWindow(QMainWindow):
                 padding: 5px;
             }
         """)
+    
+    # Методы для прямого выполнения действий из меню
+    def _export_excel(self):
+        try:
+            filepath = self.report_gen.export_to_excel()
+            QMessageBox.information(self, "Успех", f"Отчёт Excel сохранён:\n{filepath}")
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Не удалось создать отчёт:\n{str(e)}")
+    
+    def _export_pdf(self):
+        try:
+            filepath = self.report_gen.export_to_pdf()
+            QMessageBox.information(self, "Успех", f"Отчёт PDF сохранён:\n{filepath}")
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Не удалось создать отчёт:\n{str(e)}")
+    
+    def _backup_db(self):
+        try:
+            filepath = self.report_gen.backup_database()
+            QMessageBox.information(self, "Успех", f"Резервная копия создана:\n{filepath}")
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Не удалось создать резервную копию:\n{str(e)}")
     
     def _open_about(self):
         self.about_window = AboutWindow()
@@ -237,5 +255,13 @@ class MainWindow(QMainWindow):
         self.schedule_window = ScheduleWindow(self.user)
         self.schedule_window.show()
     
+    def _open_reports(self):
+        self.reports_window = ReportsWindow(self.user)
+        self.reports_window.show()
+    
     def _show_message(self, text):
         QMessageBox.information(self, "Информация", text)
+    
+    def closeEvent(self, event):
+        self.report_gen.close()
+        event.accept()
