@@ -24,12 +24,12 @@ class AboutWindow(QMainWindow):
         layout.addWidget(QLabel("Версия: 1.0"))
         
         # ЗАМЕНИ НА СВОИ ДАННЫЕ!
-        fio = QLabel("Выполнил: Иванов Иван Иванович")
+        fio = QLabel("Выполнила: Земцова Елизавета Андреевна")
         fio.setStyleSheet("font-size: 14px; font-weight: bold; color: #34495e;")
         fio.setAlignment(Qt.AlignCenter)
         layout.addWidget(fio)
         
-        group = QLabel("Группа: ИС-201")
+        group = QLabel("Группа: 22о")
         group.setStyleSheet("font-size: 14px; color: #7f8c8d;")
         group.setAlignment(Qt.AlignCenter)
         layout.addWidget(group)
