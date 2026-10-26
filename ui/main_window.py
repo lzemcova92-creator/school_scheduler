@@ -1,9 +1,10 @@
-from ui.classrooms_window import ClassroomsWindow
-from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-                             QLabel, QPushButton, QMessageBox)
+from ui.schedule_window import ScheduleWindow
+from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QMessageBox)
 from PyQt5.QtCore import Qt
 from ui.about_window import AboutWindow
 from ui.teachers_window import TeachersWindow
+from ui.classrooms_window import ClassroomsWindow
+from ui.subjects_window import SubjectsWindow
 
 
 class MainWindow(QMainWindow):
@@ -14,11 +15,13 @@ class MainWindow(QMainWindow):
         self.resize(1000, 700)
         self.setStyleSheet("background-color: #f0f2f5;")
         
-        # Создаём центральный виджет
+        # Создаём меню и статус-бар
+        self._create_menu_bar()
+        
+        # Центральный виджет
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         
-        # Основной вертикальный layout
         main_layout = QVBoxLayout(central_widget)
         main_layout.setSpacing(20)
         main_layout.setContentsMargins(50, 50, 50, 50)
@@ -40,7 +43,6 @@ class MainWindow(QMainWindow):
         role_label.setAlignment(Qt.AlignCenter)
         main_layout.addWidget(role_label)
         
-        # Пустое пространство
         main_layout.addSpacing(40)
         
         # Горизонтальный layout для кнопок
@@ -49,13 +51,13 @@ class MainWindow(QMainWindow):
         buttons_layout.setAlignment(Qt.AlignCenter)
         
         # Создаём кнопки
-        btn_schedule = QPushButton("Расписание")
+        btn_schedule = QPushButton("Предметы")
         btn_teachers = QPushButton("Преподаватели")
         btn_classrooms = QPushButton("Аудитории")
         btn_reports = QPushButton("Отчёты")
         
-        # Стиль для синих кнопок
-        blue_style = """
+        # Общий стиль для кнопок
+        button_style = """
             QPushButton {
                 background-color: #3498db;
                 color: white;
@@ -73,56 +75,33 @@ class MainWindow(QMainWindow):
             }
         """
         
-        # Стиль для зелёной кнопки
-        green_style = """
-            QPushButton {
-                background-color: #27ae60;
-                color: white;
-                border: none;
-                border-radius: 10px;
-                font-size: 18px;
-                font-weight: bold;
-                padding: 15px 30px;
-            }
-            QPushButton:hover {
-                background-color: #219a52;
-            }
-            QPushButton:pressed {
-                background-color: #1e8449;
-            }
-        """
-        
-        # Применяем стили и подключаем обработчики
-        btn_schedule.setStyleSheet(blue_style)
+        # Применяем стили
+        btn_schedule.setStyleSheet(button_style)
         btn_schedule.setFixedSize(200, 70)
-        btn_schedule.clicked.connect(lambda: self._show_message("Раздел Расписание в разработке"))
+        btn_schedule.clicked.connect(self._open_subjects)
         
-        btn_teachers.setStyleSheet(green_style)
+        btn_teachers.setStyleSheet(button_style)
         btn_teachers.setFixedSize(200, 70)
         btn_teachers.clicked.connect(self._open_teachers)
         
-        btn_classrooms.setStyleSheet(blue_style)
+        btn_classrooms.setStyleSheet(button_style)
         btn_classrooms.setFixedSize(200, 70)
         btn_classrooms.clicked.connect(self._open_classrooms)
         
-        btn_reports.setStyleSheet(blue_style)
+        btn_reports.setStyleSheet(button_style)
         btn_reports.setFixedSize(200, 70)
         btn_reports.clicked.connect(lambda: self._show_message("Раздел Отчёты в разработке"))
         
-        # Добавляем кнопки в горизонтальный layout
+        # Добавляем кнопки в layout
         buttons_layout.addWidget(btn_schedule)
         buttons_layout.addWidget(btn_teachers)
         buttons_layout.addWidget(btn_classrooms)
         buttons_layout.addWidget(btn_reports)
         
-        # Добавляем горизонтальный layout в основной
         main_layout.addLayout(buttons_layout)
-        
-        # Растягиваем нижнюю часть
         main_layout.addStretch()
         
-        # Создаём меню и статус-бар
-        self._create_menu_bar()
+        # Статус-бар
         self._create_status_bar()
     
     def _create_menu_bar(self):
@@ -151,8 +130,8 @@ class MainWindow(QMainWindow):
         
         ref_menu = menubar.addMenu("Справочники")
         ref_menu.addAction("Преподаватели", self._open_teachers)
-        ref_menu.addAction("Предметы", lambda: self._show_message("Раздел в разработке"))
-        ref_menu.addAction("Аудитории", lambda: self._show_message("Раздел в разработке"))
+        ref_menu.addAction("Предметы", self._open_subjects)
+        ref_menu.addAction("Аудитории", self._open_classrooms)
         
         sched_menu = menubar.addMenu("Расписание")
         sched_menu.addAction("Просмотр", lambda: self._show_message("Раздел в разработке"))
@@ -187,9 +166,13 @@ class MainWindow(QMainWindow):
         self.teachers_window = TeachersWindow(self.user)
         self.teachers_window.show()
     
-    def _show_message(self, text):
-        QMessageBox.information(self, "Информация", text)
-
     def _open_classrooms(self):
         self.classrooms_window = ClassroomsWindow(self.user)
         self.classrooms_window.show()
+    
+    def _open_subjects(self):
+        self.subjects_window = SubjectsWindow(self.user)
+        self.subjects_window.show()
+    
+    def _show_message(self, text):
+        QMessageBox.information(self, "Информация", text)
